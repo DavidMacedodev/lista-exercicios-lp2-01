@@ -4,7 +4,7 @@ public class Funcionario {
 
     protected String nome;
     protected String sobrenome;
-    protected int horas;
+    protected double horas;
     protected double valorHora;
 
     public Funcionario(String nome, String sobrenome, double valorHora) {
@@ -23,7 +23,7 @@ public class Funcionario {
         return sobrenome;
     }
 
-    public int getHoras() {
+    public double getHoras() {
         return horas;
     }
 
@@ -31,30 +31,35 @@ public class Funcionario {
         return valorHora;
     }
 
-    public void adicionarCargaHoraria(int h) {
+    public void adicionarCargaHoraria(double h) {
         horas += h;
     }
 
     public double getSalarioLiquido() {
+        double salario = horas * valorHora;	// salário base
 
-        double salarioMinimo =  1212.0;
-        double salario = valorHora * horas;
-        double aliquota = salario - salarioMinimo;
-        if(salario >= 3641.04) {
-            salarioMinimo = salarioMinimo - (salarioMinimo * 0.075);
-            salario = salario - (aliquota * 0.14) - salarioMinimo;
+        // tetos de faixas salariais, para efeito de alíquotas de desconto
+        double teto1 = 1212.00;
+        double teto2 = 2427.35;
+        double teto3 = 3641.03;
+        double teto4 = 7087.22;
 
-        } else if(salario >= 2427.36) {
-            salarioMinimo = salarioMinimo - (salarioMinimo * 0.075);
-            salario = salario - (aliquota * 0.12) - salarioMinimo;
-        }
-        else if(salario >= 1212.01) {
-            salarioMinimo = salarioMinimo - (salarioMinimo * 0.075);
-            salario = salario - (aliquota * 0.09) - salarioMinimo;
-        } else {
-            salario = salario - (salario * 0.075);
-        }
-        return salario;
+        // base de cálculo da 1ª faixa salarial
+        double baseCalculo1 = salario < teto1 ? salario : teto1;
+        // base de cálculo da 2ª faixa salarial
+        double baseCalculo2 = salario < teto1 ? 0 : salario >= teto2 ? teto2 - teto1 : salario - teto1;
+        // base de cálculo da 3ª faixa salarial
+        double baseCalculo3 = salario < teto2 ? 0 : salario >= teto3 ? teto3 - teto2 : salario - teto2;
+        // base de cálculo da 4ª faixa salarial
+        double baseCalculo4 = salario < teto3 ? 0 : salario >= teto4 ? teto4 - teto3 : salario - teto3;
+
+        // somatório de descontos obtidos por base de cálculo de cada faixa salarial
+        double desconto = baseCalculo1 * 7.5/100 +
+                baseCalculo2 * 9.0/100 +
+                baseCalculo3 * 12.0/100 +
+                baseCalculo4 * 14.0/100;
+
+        return salario - desconto;	// retorno de salário líquido
     }
 
 }
